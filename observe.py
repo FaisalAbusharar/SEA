@@ -10,7 +10,7 @@ def request(flow: http.HTTPFlow) -> None:
     if "google.com/search" in flow.request.pretty_url and data["logSearches"]==True:
         query = flow.request.query.get("q", None)
         if query:
-            with open("google_searches.log", "a") as log_file:
+            with open("./out/google_searches.log", "a") as log_file:
                 log_file.write(f"{query}\n")
             print(f"Logged Google Search: {query}")
 
