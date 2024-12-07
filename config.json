@@ -1,0 +1,11 @@
+{
+    "blockedkeywords": [
+        "c#", "bigbadpeople", "thingsinbed"
+    ],
+    "logSearches": true,
+
+    "shortcuts": [
+        { "snap": "https://web.snapchat.com/"},
+        {  "yt": "https://youtube.com"}
+    ]
+}
