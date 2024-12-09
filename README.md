@@ -1,5 +1,5 @@
-# SEB
-Search Engine Booster, filter out what you can search on your computer, and add shortcuts!
+# SEA
+Search Engine Add-on, filter out what you can search on your computer, and add shortcuts!
 
 ## Installation
 You must download mitmproxy, and setup the SSL certificate.
