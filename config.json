@@ -6,6 +6,7 @@
 
     "shortcuts": [
         { "snap": "https://web.snapchat.com/"},
-        {  "yt": "https://youtube.com"}
+        { "yt": "https://www.youtube.com/results?search_query="},
+        { "git": "https://github.com" }
     ]
 }
