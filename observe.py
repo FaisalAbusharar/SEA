@@ -38,7 +38,7 @@ def request(flow: http.HTTPFlow) -> None:
                 {"Location": keyword[1]}
         )
             break;
-
+        #* Shortcut Argument Function
         if str(keyword[0]) in flow.request.pretty_url or any(keyword[0] in value for value in flow.request.query.values()) and ":" in flow.request.query.get("q", None):
             result = flow.request.query.get("q", None).split(":", 1)[1] #! Remove the keyword and the : to implement the search
             flow.response = http.Response.make(
