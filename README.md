@@ -20,6 +20,9 @@ You can look at the examples inside of the `config.json`.
 ### Shortcut Function Arguments
 You can add arguments to the shortcuts by adding a `:` to the end of a keyword, for example `yt: react.js tutorial`, by doing this, you add the `react.js tutorial` to the end of the redirect url, so the original link is `https://www.youtube.com/results?search_query=`, so it becomes `https://www.youtube.com/results?search_query=+react.js+tutorial`. (_searches for it automatically_)
 
+### Update Function
+Typing `SEA [update]` will automatically reload your config file.
+
 ## How to run
 Run the command:
 `mitmproxy -s observe.py`
