@@ -10,6 +10,10 @@ shortcuts = data["shortcuts"]
 shortcut_map = {key: value for item in shortcuts for key, value in item.items()} #?creates a dictionary that i can loop through, not really sure how it fully works
 
 def request(flow: http.HTTPFlow) -> None:
+    update_config(flow)
+
+
+
     ##! LOG FUNCTION       
     if "google.com/search" in flow.request.pretty_url and data["logSearches"]==True:
         query = flow.request.query.get("q", None)
@@ -31,21 +35,48 @@ def request(flow: http.HTTPFlow) -> None:
             
     ##! SHORTCUT FUNCTION        
     for keyword in shortcut_map.items():
-        if keyword[0] == flow.request.query.get("q", None): #% Checks if the shortcut keyword matches the search, and if so redirects
-            flow.response = http.Response.make(
-                302,  # HTTP status code for redirection
-                b"",
-                {"Location": keyword[1]}
-        )
-            break;
+        try:
+            if keyword[0] == flow.request.query.get("q", None): #% Checks if the shortcut keyword matches the search, and if so redirects
+                flow.response = http.Response.make(
+                    302,  # HTTP status code for redirection
+                    b"",
+                    {"Location": keyword[1]}
+            )
+                break;
+        except AttributeError: pass 
+        except Exception as e: print(e)
+
         #* Shortcut Argument Function
-        if str(keyword[0]) in flow.request.pretty_url or any(keyword[0] in value for value in flow.request.query.values()) and ":" in flow.request.query.get("q", None):
-            result = flow.request.query.get("q", None).split(":", 1)[1] #! Remove the keyword and the : to implement the search
-            flow.response = http.Response.make(
-                302,  # HTTP status code for redirection
-                b"",
-                {"Location": keyword[1]+result}
-        )
-            break;
+        if str(keyword[0]) in flow.request.pretty_url or any(keyword[0] in value for value in flow.request.query.values()):
+            if flow.request.query.get("q", None) is not None and ":" in flow.request.query.get("q", None):
+                if flow.request.query.get("q", None).split(":", 1)[0].strip() == keyword[0]:
+                    print(flow.request.query.get("q", None).split(":", 1)[0].strip())
+                    result = flow.request.query.get("q", None).split(":", 1)[1].strip() #! Remove the keyword and the : to implement the search
+                    flow.response = http.Response.make(
+                        302,  # HTTP status code for redirection s
+                        b"",
+                        {"Location": keyword[1]+result}
+                )
+                    break;
+
+
     
-    
+def update_config(flow: http.HTTPFlow) -> None:
+    ##* Update Function
+    if "SEA [update]" in flow.request.pretty_url or any("SEA [update]" in value for value in flow.request.query.values()):
+        try:
+            with open('config.json',"r") as file: #! Reload the variables
+                new_data = json.load(file) 
+                global blocked_keywords, shortcut_map, shortcuts 
+                blocked_keywords = new_data["blockedkeywords"] 
+                shortcuts = new_data["shortcuts"]
+                shortcut_map = {key: value for item in shortcuts for key, value in item.items()} 
+                flow.response = http.Response.make(
+                    200, #Update the page to let the user know that we updated the page
+                    b"Configuration updated successfully.",
+                    {"Content-Type": "text/plain"}
+                )
+                print("Updated configuration")
+        except Exception as e:
+            pass
+        
