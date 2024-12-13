@@ -1,6 +1,8 @@
 from mitmproxy import http
 import json
-
+import threading
+import time
+import requests
 
 with open('config.json','r') as file:
     data = json.load(file)
@@ -9,10 +11,24 @@ blocked_keywords = data["blockedkeywords"]
 shortcuts = data["shortcuts"]
 shortcut_map = {key: value for item in shortcuts for key, value in item.items()} #?creates a dictionary that i can loop through, not really sure how it fully works
 
+
+
+def auto_update_checker():
+    while True:
+        if data["autoUpdate"] == True:  # Check if autoUpdate is True
+            try:
+                reload()
+            except Exception as e:
+                print(f"Error during auto-update: {e}")
+        time.sleep(60) 
+
+# Start the background thread
+threading.Thread(target=auto_update_checker, daemon=True).start()
+
+
 def request(flow: http.HTTPFlow) -> None:
     if flow.request.method != "GET": return;
     update_config(flow)
-
 
 
     ##! LOG FUNCTION       
@@ -39,7 +55,7 @@ def request(flow: http.HTTPFlow) -> None:
         try:
             if keyword[0] == flow.request.query.get("q", None): #% Checks if the shortcut keyword matches the search, and if so redirects
                 flow.response = http.Response.make(
-                    302,  # HTTP status code for redirection
+                    302,  #& HTTP status code for redirection
                     b"",
                     {"Location": keyword[1]}
             )
@@ -54,7 +70,7 @@ def request(flow: http.HTTPFlow) -> None:
                     print(flow.request.query.get("q", None).split(":", 1)[0].strip())
                     result = flow.request.query.get("q", None).split(":", 1)[1].strip() #! Remove the keyword and the : to implement the search
                     flow.response = http.Response.make(
-                        302,  # HTTP status code for redirection s
+                        302,  #& HTTP status code for redirections
                         b"",
                         {"Location": keyword[1]+result}
                 )
@@ -65,19 +81,22 @@ def request(flow: http.HTTPFlow) -> None:
 def update_config(flow: http.HTTPFlow) -> None:
     ##* Update Function
     if "SEA [update]" in flow.request.pretty_url or any("SEA [update]" in value for value in flow.request.query.values()):
-        try:
-            with open('config.json',"r") as file: #! Reload the variables
+        reload(True, flow=flow)
+        
+def reload(flowNeeded=False, flow=None):
+    try:
+        with open('config.json',"r") as file: #! Reload the variables
                 new_data = json.load(file) 
                 global blocked_keywords, shortcut_map, shortcuts 
                 blocked_keywords = new_data["blockedkeywords"] 
                 shortcuts = new_data["shortcuts"]
                 shortcut_map = {key: value for item in shortcuts for key, value in item.items()} 
-                flow.response = http.Response.make(
-                    200, #Update the page to let the user know that we updated the page
-                    b"Configuration updated successfully.",
-                    {"Content-Type": "text/plain"}
-                )
-                print("Updated configuration")
-        except Exception as e:
+                if flowNeeded == True:
+                    flow.response = http.Response.make(
+                        200, #Update the page to let the user know that we updated the page
+                        b"Configuration updated successfully.",
+                        {"Content-Type": "text/plain"}
+                    )
+                    print("Updated configuration")
+    except Exception as e:
             pass
-        

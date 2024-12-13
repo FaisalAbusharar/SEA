@@ -1,8 +1,9 @@
 {
     "blockedkeywords": [
-        "c#", "bigbadpeople", "thingsinbed", "ahmadisbad", "meoww"
+        "c#", "bigbadpeople", "thingsinbed"
     ],
     "logSearches": true,
+    "autoUpdate": true,
 
     "shortcuts": [
         { "snap": "https://web.snapchat.com/"},
