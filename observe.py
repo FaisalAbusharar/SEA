@@ -11,27 +11,8 @@ blocked_keywords = data["blockedkeywords"]
 shortcuts = data["shortcuts"]
 shortcut_map = {key: value for item in shortcuts for key, value in item.items()} #?creates a dictionary that i can loop through, not really sure how it fully works
 
-
-
-def auto_update_checker():
-    while True:
-        if data["autoUpdate"] == True:  # Check if autoUpdate is True
-            try:
-                reload()
-            except Exception as e:
-                print(f"Error during auto-update: {e}")
-        time.sleep(60) 
-
-# Start the background thread
-threading.Thread(target=auto_update_checker, daemon=True).start()
-
-
-def request(flow: http.HTTPFlow) -> None:
-    if flow.request.method != "GET": return;
-    update_config(flow)
-
-
-    ##! LOG FUNCTION       
+"""Log Function"""
+def logging_function(flow: http.HTTPFlow, log_searches: bool):
     if "google.com/search" in flow.request.pretty_url and data["logSearches"]==True:
         query = flow.request.query.get("q", None)
         if query:
@@ -39,7 +20,8 @@ def request(flow: http.HTTPFlow) -> None:
                 log_file.write(f"{query}\n") #* Writes to the file, if logsearches is enabled.
             print(f"Logged Google Search: {query}")
 
-    ##! BLOCK FUNCTION        
+"""Block Function"""
+def block_function(flow: http.HTTPFlow):
     for keyword in blocked_keywords:
         if keyword in flow.request.pretty_url or any(keyword in value for value in flow.request.query.values()): #% Checks if the blocked keyword is in the request, and if so block it
             flow.response = http.Response.make(
@@ -50,7 +32,8 @@ def request(flow: http.HTTPFlow) -> None:
             print(f"Blocked request to: {flow.request.pretty_url}")
             
             
-    ##! SHORTCUT FUNCTION        
+"""Shortcut Function""" 
+def shortcut_function(flow: http.HTTPFlow):      
     for keyword in shortcut_map.items():
         try:
             if keyword[0] == flow.request.query.get("q", None): #% Checks if the shortcut keyword matches the search, and if so redirects
@@ -59,9 +42,8 @@ def request(flow: http.HTTPFlow) -> None:
                     b"",
                     {"Location": keyword[1]}
             )
-                break;
-        except AttributeError: pass 
-        except Exception as e: print(e)
+                return True;
+        except Exception as e: print(f"Error occurred: {e}")
 
         #* Shortcut Argument Function
         if str(keyword[0]) in flow.request.pretty_url or any(keyword[0] in value for value in flow.request.query.values()):
@@ -75,9 +57,8 @@ def request(flow: http.HTTPFlow) -> None:
                         {"Location": keyword[1]+result}
                 )
                     break;
-
-
-    
+        
+"""Update Function"""
 def update_config(flow: http.HTTPFlow) -> None:
     ##* Update Function
     if "SEA [update]" in flow.request.pretty_url or any("SEA [update]" in value for value in flow.request.query.values()):
@@ -99,4 +80,46 @@ def reload(flowNeeded=False, flow=None):
                     )
                     print("Updated configuration")
     except Exception as e:
-            pass
+            pass    
+        
+
+
+#! AUTO UPDATE FUNCTION
+def auto_update_checker():
+    while True:
+        if data["autoUpdate"] == True:  #% Check if autoUpdate is True
+            try:
+                reload()
+            except Exception as e:
+                print(f"Error during auto-update: {e}")
+        time.sleep(60) 
+
+#% Start the background thread
+threading.Thread(target=auto_update_checker, daemon=True).start()
+
+
+
+            
+def request(flow: http.HTTPFlow) -> None:
+    if flow.request.method != "GET": return;
+    
+    #! Update configuration if needed
+    update_config(flow)
+
+    #% Log Google searches
+    logging_function(flow, data["logSearches"])
+
+    #& Block requests with forbidden keywords
+    if block_function(flow):
+        return  # Stop processing if blocked
+
+    #* Handle shortcuts
+    if shortcut_function(flow):
+        return
+
+  
+            
+            
+    
+
+    
