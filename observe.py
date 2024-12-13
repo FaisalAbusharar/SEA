@@ -10,6 +10,7 @@ shortcuts = data["shortcuts"]
 shortcut_map = {key: value for item in shortcuts for key, value in item.items()} #?creates a dictionary that i can loop through, not really sure how it fully works
 
 def request(flow: http.HTTPFlow) -> None:
+    if flow.request.method != "GET": return;
     update_config(flow)
 
 
