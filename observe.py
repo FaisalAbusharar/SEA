@@ -7,6 +7,7 @@ from functions.blocking import block_function
 from functions.config_handler import reload, update_config
 from functions.handle_shortcut import shortcut_function
 from backend.generateNewConfig import generateConfig
+from backend.logStatistics import update_metric
 
 
 
@@ -67,6 +68,7 @@ def request(flow: http.HTTPFlow) -> None:
 
     #% Log Google searchesg
     logging_function(flow, data["logSearches"])
+        
 
     #& Block requests with forbidden keywords
     if block_function(flow, blocked_keywords):

@@ -24,5 +24,5 @@ def shortcut_function(flow: mitmproxy.http.HTTPFlow, shortcut_map=None):
                         b"",
                         {"Location": keyword[1]+result}
                 )
-                    break;
+    return True
         

@@ -5,6 +5,7 @@ def update_config(flow: http.HTTPFlow, data):
     """Reload the configuration file."""
     if "SEA [update]" in flow.request.pretty_url or "SEA [update]" in flow.request.query.values():
         reload(flowNeeded=True, flow=flow, current_data=data)
+    return True
 
 def reload(flowNeeded=False, flow=None, current_data=None):
     try:
@@ -20,4 +21,5 @@ def reload(flowNeeded=False, flow=None, current_data=None):
                     print("Updated configuration")
     except Exception as e:
             pass    
+    return True
         

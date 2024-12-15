@@ -10,3 +10,4 @@ def logging_function(flow: mitmproxy.http.HTTPFlow, data):
             with open("out\google_searches.log", "a") as logfile:
                 logfile.write(f"{query}\n")
             print(f"Logged Google Search: {query}")
+    return True

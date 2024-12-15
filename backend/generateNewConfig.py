@@ -7,6 +7,7 @@ data = {
     ],
     "logSearches": True,
     "autoUpdate": True,
+    "logStatistics": True,
     "shortcuts": [
         {"example": "https://example.com"}
     ]
