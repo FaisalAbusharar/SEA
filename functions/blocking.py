@@ -1,5 +1,5 @@
 import mitmproxy
-
+from backend.logStatistics import update_metric
 
 """Block Function"""
 def block_function(flow: mitmproxy.http.HTTPFlow, blocked_keywords):
@@ -11,4 +11,4 @@ def block_function(flow: mitmproxy.http.HTTPFlow, blocked_keywords):
                     {"Content-Type": "text/plain"}
                 )
             print(f"Blocked request to: {flow.request.pretty_url}")
-    return True
+            return True

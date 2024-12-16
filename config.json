@@ -1,12 +1,13 @@
 {
     "blockedkeywords": [
-        "example"
+        "example", "block", "faisal"
     ],
-    "logSearches": true,
+    "logSearches": false,
     "autoUpdate": true,
     "shortcuts": [
         {
-            "example": "https://example.com"
+            "example": "https://example.com",
+            "izz": "https://snapchat.com"
         }
     ]
 }

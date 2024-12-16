@@ -64,18 +64,24 @@ def request(flow: http.HTTPFlow) -> None:
     if flow.request.method != "GET": return;
     
     #! Update configuration if needed
-    update_config(flow, data=data)
+    if update_config(flow, data=data) == True:
+        update_metric("config_update")
+        
 
     #% Log Google searchesg
-    logging_function(flow, data["logSearches"])
+    if logging_function(flow, data["logSearches"]) == True:
+        update_metric("logged_searches")
+        
         
 
     #& Block requests with forbidden keywords
-    if block_function(flow, blocked_keywords):
+    if block_function(flow, blocked_keywords) == True:
+        update_metric("blocked_keyword")
         return  #! Stop processing if blocked
 
     #* Handle shortcuts
-    if shortcut_function(flow, shortcut_map=shortcut_map):
+    if shortcut_function(flow, shortcut_map=shortcut_map) == True:
+        update_metric("shortcuts_triggerd")
         return 
 
   

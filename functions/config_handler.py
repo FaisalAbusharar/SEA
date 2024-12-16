@@ -1,5 +1,6 @@
 import json
 from mitmproxy import http
+from backend.logStatistics import update_metric
 
 def update_config(flow: http.HTTPFlow, data):
     """Reload the configuration file."""
@@ -19,7 +20,7 @@ def reload(flowNeeded=False, flow=None, current_data=None):
                         {"Content-Type": "text/plain"}
                     )
                     print("Updated configuration")
+                return True   
     except Exception as e:
             pass    
-    return True
         

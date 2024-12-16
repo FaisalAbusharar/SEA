@@ -1,5 +1,6 @@
 import mitmproxy
 
+
 """Shortcut Function""" 
 def shortcut_function(flow: mitmproxy.http.HTTPFlow, shortcut_map=None):      
     for keyword in shortcut_map.items():
@@ -24,5 +25,5 @@ def shortcut_function(flow: mitmproxy.http.HTTPFlow, shortcut_map=None):
                         b"",
                         {"Location": keyword[1]+result}
                 )
-    return True
+                    return True
         
