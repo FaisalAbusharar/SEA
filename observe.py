@@ -11,7 +11,7 @@ from backend.logStatistics import update_metric
 """LOAD VARIABLES"""
 def load_config(file_path='config.json', required_keys=None):
     """Loads and validates the configuration file."""
-    required_keys = required_keys or {"blockedkeywords", "shortcuts", "logSearches", "autoUpdate"}  # ! Update this regularly
+    required_keys = required_keys or {"blockedkeywords", "shortcuts", "logSearches", "autoUpdate", "strictMode"}  # ! Update this regularly
     try:
         with open(file_path, 'r') as file:
             config_data = json.load(file)
@@ -56,10 +56,11 @@ ConfigManager.load()
 
 def regenerate_constants():
     """Rebuild constants dependent on the configuration."""
-    global blocked_keywords, shortcut_map
+    global blocked_keywords, shortcut_map, strict_mode
     data = ConfigManager.get()
     blocked_keywords = data["blockedkeywords"]
     shortcuts = data["shortcuts"]
+    strict_mode = data["strictMode"]
     shortcut_map = {key: value for item in shortcuts for key, value in item.items()}
     update_metric("config_update")
     
@@ -92,6 +93,7 @@ def request(flow: http.HTTPFlow) -> None:
         return
 
     # ! Update configuration if needed
+    print(flow.request.query.values())
     if "SEA [update]" in flow.request.pretty_url or "SEA [update]" in flow.request.query.values():
         ConfigManager.reload()
         regenerate_constants()
@@ -108,7 +110,7 @@ def request(flow: http.HTTPFlow) -> None:
         update_metric("logged_searches")
 
     # & Block requests with forbidden keywords
-    if block_function(flow, blocked_keywords) == True:
+    if block_function(flow, blocked_keywords, strict_mode) == True:
         update_metric("blocked_keyword")
         return  # ! Stop processing if blocked
 

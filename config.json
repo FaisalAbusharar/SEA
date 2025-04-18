@@ -2,6 +2,10 @@
     "blockedkeywords": [
         "example"
     ],
+
+    "strictMode" : true, 
+ 
+
     "logSearches": true,
     "autoUpdate": true,
     "shortcuts": [
